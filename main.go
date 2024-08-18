@@ -9,11 +9,11 @@ import (
 
 // 住所を表す構造体
 type Address struct {
-	machiCode string // 町コード
-	banCode   string // 番地コード
-	edaCode   string // 枝番コード
-	koedaCode string // 小枝番コード
-	eda3Code string // 枝番３コード
+	MachiCode string // 町コード
+	BanCode   string // 番地コード
+	EdaCode   string // 枝番コード
+	KoedaCode string // 小枝番コード
+	Eda3Code  string // 枝番３コード
 }
 
 // 住所範囲を表す構造体
@@ -24,38 +24,39 @@ type Region struct {
 
 // レコードを表す構造体
 type Record struct {
-	region Region // 住所範囲
-	gakuKubun string // 学校区分
-	gakuCode string // 学校コード
+	region       Region // 住所範囲
+	gakuKubun    string // 学校区分
+	gakuCode     string // 学校コード
+	sakujoFlag   string // 削除フラグ
+	updateYMD    string // 更新日
+	jichiCode    string // 自治体コード
 	updateYMDHMS string // 更新日
 }
 
-// 文字列を Address 構造体に変換する関数
-func ParseAddress(s [5]string) Address {
-	return Address{
-		machiCode: s[0],
-		banCode:   s[1],
-		edaCode:   s[2],
-		koedaCode: s[3],
-		eda3Code: s[4],
-	}
-}
-
-// 1行の入力を Region 構造体に変換する関数
-func ParseRegion(line string) (Region, error) {
-	addresses := strings.Split(line, ",")
-	// TODO: 20の見直し
-	if len(addresses) == 20 {
-		return fmt.Errorf("入力ファイルの形式が誤っています。想定している項目数は 20 です。(len(address)=%d", len(address)))
+// 1行の入力を Record 構造体に変換する関数
+func createRecord(line string) (Record, error) {
+	items := strings.Split(line, ",")
+	if len(items) == 16 {
+		return Record{}, fmt.Errorf("入力ファイルの形式が誤っています。想定している項目数は 20 です。(len(line)=%d", len(line))
 	}
 
-	// TODO: 引数の見直し
+	// 住所範囲
 	r := Region{
-		Start: ParseAddress(addresses[0:5]),
-		End:   ParseAddress(addresses[6:5]),
+		Start: Address{MachiCode: items[0], BanCode: items[1], EdaCode: items[2], KoedaCode: items[3], Eda3Code: items[4]},
+		End:   Address{MachiCode: items[5], BanCode: items[6], EdaCode: items[7], KoedaCode: items[8], Eda3Code: items[9]},
 	}
 
-	return r, nil
+	record := Record{
+		region:       r,
+		gakuKubun:    items[10],
+		gakuCode:     items[11],
+		sakujoFlag:   items[12],
+		updateYMD:    items[13],
+		jichiCode:    items[14],
+		updateYMDHMS: items[15],
+	}
+
+	return record, nil
 }
 
 // Address 構造体を文字列に変換する関数
@@ -100,23 +101,27 @@ func main() {
 	defer outFile.Close()
 
 	scanner := bufio.NewScanner(inFile)
-	var previousRegion Region
+	var previousRecord Record
 	var isFirstLine = true
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		currentRegion := ParseRegion(line)
+		currentRecord, err := createRecord(line)
+		if err != nil {
+			fmt.Printf("ERR: %w\n", err)
+			return
+		}
 
 		if !isFirstLine {
-			if !CheckContinuity(previousRegion, currentRegion) {
-				missingRegions := FindMissingRegions(previousRegion, currentRegion)
+			if !CheckContinuity(previousRecord, currentRecord) {
+				missingRegions := FindMissingRegions(previousRecord, currentRecord)
 				for _, region := range missingRegions {
 					outFile.WriteString(fmt.Sprintf("%s %s\n", AddressToString(region.Start), AddressToString(region.End)))
 				}
 			}
 		}
 
-		previousRegion = currentRegion
+		previousRecord = currentRecord
 		isFirstLine = false
 	}
 
