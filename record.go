@@ -18,13 +18,25 @@ type Record struct {
 	updateYMDHMS string // 更新日
 }
 
-func (re Record) ToString() string {
-	return fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s", re.region.ToString(), re.gakuKubun, re.gakuCode, re.sakujoFlag, re.updateYMD, re.jichiCode, re.updateYMDHMS)
+func (r Record) ToString() string {
+	return fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s", r.region.ToString(), r.gakuKubun, r.gakuCode, r.sakujoFlag, r.updateYMD, r.jichiCode, r.updateYMDHMS)
 }
 
 // 学校区分が小学校の場合 true を、そうでない場合 false を返す
-func (re Record) IsShogaku() bool {
-	return re.gakuKubun == "1"
+func (r Record) IsShogaku() bool {
+	return r.gakuKubun == "1"
+}
+
+// 2つの地域の間の欠けている地域を見つける関数
+func (r Record) FindMissingRegions(pr Record) ([]Region, bool) {
+	mr := make([]Region, 0)
+	// 直前のレコードと町コードが異なる場合は、直前のレコード～ALL 9と、ALL 0～自身のレコードを返す
+	if pr.region.End.MachiCode != r.region.Start.MachiCode {
+		mr = append(mr)
+		mr = append(mr)
+	}
+
+	return mr, true
 }
 
 // 1行の入力を Record 構造体に変換する関数
