@@ -22,6 +22,7 @@ func (r Region) EndRegion() *Region {
 	return &Region{
 		Start: *na,
 		End: Address{
+			JichiCode: na.JichiCode,
 			MachiCode: na.MachiCode,
 			BanCode:   "99999",
 			EdaCode:   "99999",
@@ -33,12 +34,13 @@ func (r Region) EndRegion() *Region {
 func (r Region) StartRegion() *Region {
 	// 開始住所が最小値の場合、nilを返す
 	pa := r.Start.Previous()
-	if pa != nil {
+	if pa == nil {
 		return nil
 	}
 
 	return &Region{
 		Start: Address{
+			JichiCode: pa.JichiCode,
 			MachiCode: pa.MachiCode,
 			BanCode:   "00000",
 			EdaCode:   "00000",
@@ -46,4 +48,9 @@ func (r Region) StartRegion() *Region {
 		},
 		End: *pa,
 	}
+}
+
+// 2つの地域が連続しているかをチェックする関数
+func (r Region) CheckContinuity(pr Region) bool {
+	return *pr.End.Next() == r.Start
 }

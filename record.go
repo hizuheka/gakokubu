@@ -28,15 +28,31 @@ func (r Record) IsShogaku() bool {
 }
 
 // 2つの地域の間の欠けている地域を見つける関数
-func (r Record) FindMissingRegions(pr Record) ([]Region, bool) {
-	mr := make([]Region, 0)
+func (r Record) FindMissingRegions(pr Record) []Region {
 	// 直前のレコードと町コードが異なる場合は、直前のレコード～ALL 9と、ALL 0～自身のレコードを返す
 	if pr.region.End.MachiCode != r.region.Start.MachiCode {
-		mr = append(mr)
-		mr = append(mr)
+		mr := make([]Region, 0)
+		if er := pr.region.EndRegion(); er != nil {
+			mr = append(mr, *er)
+		}
+		if sr := pr.region.StartRegion(); sr != nil {
+			mr = append(mr, *sr)
+		}
+		return mr
 	}
 
-	return mr, true
+	// 直前のレコードと続いている場合は、nilを返す
+	if r.region.CheckContinuity(pr.region) {
+		return nil
+	}
+
+	// 直前のレコードと続いていない場合、直前のレコードの次の住所～今のレコードの前の住所を返す
+	return []Region{
+		{
+			Start: *pr.region.End.Next(),
+			End:   *r.region.Start.Previous(),
+		},
+	}
 }
 
 // 1行の入力を Record 構造体に変換する関数
@@ -49,18 +65,18 @@ func createRecord(line string) (Record, error) {
 	// 住所範囲
 	r := Region{
 		Start: Address{
+			JichiCode: items[14],
 			MachiCode: items[0],
 			BanCode:   width.Fold.String(items[1]),
 			EdaCode:   width.Fold.String(items[2]),
 			KoedaCode: width.Fold.String(items[3]),
-			Eda3Code:  width.Fold.String(items[4]),
 		},
 		End: Address{
+			JichiCode: items[14],
 			MachiCode: items[5],
 			BanCode:   width.Fold.String(items[6]),
 			EdaCode:   width.Fold.String(items[7]),
 			KoedaCode: width.Fold.String(items[8]),
-			Eda3Code:  width.Fold.String(items[9]),
 		},
 	}
 
@@ -75,4 +91,16 @@ func createRecord(line string) (Record, error) {
 	}
 
 	return record, nil
+}
+
+func createDummyRecord(kubun, jichiCode string) Record {
+	return Record{
+		region:       Region{},
+		gakuKubun:    kubun,
+		gakuCode:     "00999",
+		sakujoFlag:   "0",
+		updateYMD:    "99999999",
+		jichiCode:    jichiCode,
+		updateYMDHMS: "99999999999999",
+	}
 }

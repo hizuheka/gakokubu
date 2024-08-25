@@ -6,21 +6,6 @@ import (
 	"os"
 )
 
-// 2つの地域が連続しているかをチェックする関数
-func CheckContinuity(r1, r2 Record) bool {
-	// TODO
-	return true
-	// return AddressToString(r1.End) == AddressToString(r2.Start)
-}
-
-// 2つの地域の間の欠けている地域を見つける関数
-func FindMissingRegions(r1, r2 Region) []Region {
-	// TODO
-	var missingRegions []Region
-	// 欠けている地域のチェックをシミュレーション。この部分は正確な住所範囲ロジックに基づいて実装する必要があります。
-	return missingRegions
-}
-
 func main() {
 	if len(os.Args) != 3 {
 		fmt.Println("使用方法: gakokubu.exe <input_file> <output_file>")
@@ -70,6 +55,34 @@ func main() {
 		fmt.Printf("ファイル読み取りエラー: %v\n", err)
 	}
 
+	// 小学校
+	isFirstLine := true
+	var preRecord Record
+	for _, record := range syogakuRecords {
+		// 最初のレコードの場合
+		if isFirstLine {
+			if re := record.region.StartRegion(); re != nil {
+				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
+				addRecord.region = *re
+				syogakuRecords = append(syogakuRecords, addRecord)
+			}
+			isFirstLine = false
+		} else { // 2行目以降のレコードの場合
+			if fmr := record.FindMissingRegions(preRecord); fmr != nil {
+				for _, region := range fmr {
+					addRecord := createDummyRecord(record.gakuKubun, region.Start.JichiCode)
+					re := region
+					addRecord.region = re
+					syogakuRecords = append(syogakuRecords, addRecord)
+				}
+			}
+		}
+
+		preRecord = record
+	}
+
+	fmt.Println(syogakuRecords)
+	// 中学校
 	// if !isFirstLine {
 	// if !CheckContinuity(previousRecord, currentRecord) {
 	// missingRegions := FindMissingRegions(previousRecord, currentRecord)

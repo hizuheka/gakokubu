@@ -9,6 +9,7 @@ import (
 
 // 住所を表す構造体
 type Address struct {
+	JichiCode string // 自治体コード
 	MachiCode string // 町コード
 	BanCode   string // 番地コード
 	EdaCode   string // 枝番コード
@@ -35,6 +36,7 @@ func (a Address) Next() *Address {
 	nextS := fmt.Sprintf("%15d", nextL)
 	// next Addressの組み立て
 	return &Address{
+		JichiCode: a.JichiCode,
 		MachiCode: a.MachiCode,
 		BanCode:   nextS[0:5],
 		EdaCode:   nextS[5:10],
@@ -58,6 +60,7 @@ func (a Address) Previous() *Address {
 	preS := fmt.Sprintf("%15d", preL)
 	// next Addressの組み立て
 	return &Address{
+		JichiCode: a.JichiCode,
 		MachiCode: a.MachiCode,
 		BanCode:   preS[0:5],
 		EdaCode:   preS[5:10],
