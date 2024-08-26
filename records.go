@@ -1,5 +1,10 @@
 package main
 
+
+import (
+        "sort"
+)
+
 type Records []Record
 
 func (rs Records) Sort() {
