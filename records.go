@@ -22,3 +22,7 @@ func (r Records) Sort() {
                 }
         })
 }
+
+func createRecords() Records {
+    return make([]Record, 0, 3000)
+}
