@@ -102,6 +102,15 @@ func main() {
 	})
 
 	fmt.Println(syogakuRecords)
+
+    w := bufio.NewWriter(outFile)
+    for _,r := range syogakuRecords {
+        if _, err := w.WriteString(r.ToString()+"\n"); err != nil {
+            fmt.Printf("ファイル出力エラー: %v\n", err)
+		          return
+    }
+    w.Flush()
+
 	// 中学校
 	// if !isFirstLine {
 	// if !CheckContinuity(previousRecord, currentRecord) {
