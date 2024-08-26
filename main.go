@@ -33,8 +33,8 @@ func main() {
 	// var previousRecord Record
 	// var isFirstLine = true
 
-	syogakuRecords := make([]Record, 0, 3000)
-	chugakuRecords := make([]Record, 0, 3000)
+	syogakuRecords := createRecords()
+	chugakuRecords := createRecords()
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -87,19 +87,7 @@ func main() {
 	}
 
 	// ソート
-	sort.Slice(syogakuRecords, func(i, j int) bool {
-		if syogakuRecords[i].region.Start.MachiCode < syogakuRecords[j].region.Start.MachiCode {
-			return true
-		} else if syogakuRecords[i].region.Start.BanCode < syogakuRecords[j].region.Start.BanCode {
-			return true
-		} else if syogakuRecords[i].region.Start.EdaCode < syogakuRecords[j].region.Start.EdaCode {
-			return true
-		} else if syogakuRecords[i].region.Start.KoedaCode < syogakuRecords[j].region.Start.KoedaCode {
-			return true
-		} else {
-			return false
-		}
-	})
+    syogakuRecords.Sort()
 
 	fmt.Println(syogakuRecords)
 
