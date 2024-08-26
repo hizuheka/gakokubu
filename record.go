@@ -58,7 +58,7 @@ func (r Record) FindMissingRegions(pr Record) []Region {
 // 1行の入力を Record 構造体に変換する関数
 func createRecord(line string) (Record, error) {
 	items := strings.Split(line, ",")
-	if len(items) == 16 {
+	if len(items) != 16 {
 		return Record{}, fmt.Errorf("入力ファイルの形式が誤っています。想定している項目数は 16 です。(len(line)=%d", len(line))
 	}
 

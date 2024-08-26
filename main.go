@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -56,17 +57,21 @@ func main() {
 	}
 
 	// 小学校
-	isFirstLine := true
 	var preRecord Record
-	for _, record := range syogakuRecords {
+	for i, record := range syogakuRecords {
 		// 最初のレコードの場合
-		if isFirstLine {
+		if i == 0 {
 			if re := record.region.StartRegion(); re != nil {
 				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
 				addRecord.region = *re
 				syogakuRecords = append(syogakuRecords, addRecord)
 			}
-			isFirstLine = false
+		} else if i == len(syogakuRecords)-1 { // 最後のレコード
+			if re := record.region.EndRegion(); re != nil {
+				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
+				addRecord.region = *re
+				syogakuRecords = append(syogakuRecords, addRecord)
+			}
 		} else { // 2行目以降のレコードの場合
 			if fmr := record.FindMissingRegions(preRecord); fmr != nil {
 				for _, region := range fmr {
@@ -80,6 +85,21 @@ func main() {
 
 		preRecord = record
 	}
+
+	// ソート
+	sort.Slice(syogakuRecords, func(i, j int) bool {
+		if syogakuRecords[i].region.Start.MachiCode < syogakuRecords[j].region.Start.MachiCode {
+			return true
+		} else if syogakuRecords[i].region.Start.BanCode < syogakuRecords[j].region.Start.BanCode {
+			return true
+		} else if syogakuRecords[i].region.Start.EdaCode < syogakuRecords[j].region.Start.EdaCode {
+			return true
+		} else if syogakuRecords[i].region.Start.KoedaCode < syogakuRecords[j].region.Start.KoedaCode {
+			return true
+		} else {
+			return false
+		}
+	})
 
 	fmt.Println(syogakuRecords)
 	// 中学校

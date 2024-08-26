@@ -33,7 +33,7 @@ func (a Address) Next() *Address {
 	// 1を足す
 	nextL := l + 1
 	// 15桁の文字列に戻す
-	nextS := fmt.Sprintf("%15d", nextL)
+	nextS := fmt.Sprintf("%015d", nextL)
 	// next Addressの組み立て
 	return &Address{
 		JichiCode: a.JichiCode,
@@ -57,7 +57,7 @@ func (a Address) Previous() *Address {
 	// 1を足す
 	preL := l - 1
 	// 15桁の文字列に戻す
-	preS := fmt.Sprintf("%15d", preL)
+	preS := fmt.Sprintf("%015d", preL)
 	// next Addressの組み立て
 	return &Address{
 		JichiCode: a.JichiCode,
