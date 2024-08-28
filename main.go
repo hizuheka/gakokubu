@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 )
 
 func main() {
@@ -57,47 +56,54 @@ func main() {
 	}
 
 	// 小学校
+	var addRecords Records
 	var preRecord Record
 	for i, record := range syogakuRecords {
+		fmt.Printf("i=%d\n", i)
 		// 最初のレコードの場合
 		if i == 0 {
+			fmt.Println("最初のレコード")
 			if re := record.region.StartRegion(); re != nil {
 				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
 				addRecord.region = *re
-				syogakuRecords = append(syogakuRecords, addRecord)
+				addRecords = append(addRecords, addRecord)
 			}
 		} else if i == len(syogakuRecords)-1 { // 最後のレコード
+			fmt.Println("最後のレコード")
 			if re := record.region.EndRegion(); re != nil {
 				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
 				addRecord.region = *re
-				syogakuRecords = append(syogakuRecords, addRecord)
+				addRecords = append(addRecords, addRecord)
 			}
 		} else { // 2行目以降のレコードの場合
+			fmt.Println("2番目以降のレコード")
 			if fmr := record.FindMissingRegions(preRecord); fmr != nil {
 				for _, region := range fmr {
 					addRecord := createDummyRecord(record.gakuKubun, region.Start.JichiCode)
 					re := region
 					addRecord.region = re
-					syogakuRecords = append(syogakuRecords, addRecord)
+					addRecords = append(addRecords, addRecord)
 				}
 			}
 		}
 
 		preRecord = record
 	}
+	syogakuRecords = append(syogakuRecords, addRecords...)
 
 	// ソート
-    syogakuRecords.Sort()
+	syogakuRecords.Sort()
 
-	fmt.Println(syogakuRecords)
+	// fmt.Println(syogakuRecords)
 
-    w := bufio.NewWriter(outFile)
-    for _,r := range syogakuRecords {
-        if _, err := w.WriteString(r.ToString()+"\n"); err != nil {
-            fmt.Printf("ファイル出力エラー: %v\n", err)
-		          return
-    }
-    w.Flush()
+	w := bufio.NewWriter(outFile)
+	for _, r := range syogakuRecords {
+		if _, err := w.WriteString(r.ToString() + "\n"); err != nil {
+			fmt.Printf("ファイル出力エラー: %v\n", err)
+			return
+		}
+	}
+	w.Flush()
 
 	// 中学校
 	// if !isFirstLine {
