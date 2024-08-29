@@ -35,7 +35,7 @@ func (r Record) FindMissingRegions(pr Record) []Region {
 		if er := pr.region.EndRegion(); er != nil {
 			mr = append(mr, *er)
 		}
-		if sr := pr.region.StartRegion(); sr != nil {
+		if sr := r.region.StartRegion(); sr != nil {
 			mr = append(mr, *sr)
 		}
 		return mr
