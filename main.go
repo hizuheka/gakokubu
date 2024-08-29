@@ -2,26 +2,45 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 )
 
+var version string
+
 func main() {
-	if len(os.Args) != 3 {
-		fmt.Println("使用方法: gakokubu.exe <input_file> <output_file>")
+	var (
+		i, o string
+		v    bool
+	)
+	flag.StringVar(&i, "i", "", "変換元ファイル")
+	flag.StringVar(&o, "o", "", "変換先ファイル")
+	flag.BoolVar(&v, "v", false, "version")
+	flag.Parse()
+
+	if v {
+		fmt.Printf("gakokubu.exe version %s\r\n", version)
 		return
 	}
 
-	inputFile := os.Args[1]
-	inFile, err := os.Open(inputFile)
+	if i == "" {
+		fmt.Printf("-i が指定されていません。変換元ファイルのパスを指定してください。(-i=%s)", i)
+		return
+	}
+	if o == "" {
+		fmt.Printf("-o が指定されていません。変換先ファイルのパスを指定してください。(-o=%s)", o)
+		return
+	}
+
+	inFile, err := os.Open(i)
 	if err != nil {
 		fmt.Printf("ファイルを開く際のエラー: %v\n", err)
 		return
 	}
 	defer inFile.Close()
 
-	outputFile := os.Args[2]
-	outFile, err := os.Create(outputFile)
+	outFile, err := os.Create(o)
 	if err != nil {
 		fmt.Printf("出力ファイルの作成エラー: %v\n", err)
 		return
