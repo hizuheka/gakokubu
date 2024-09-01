@@ -85,6 +85,9 @@ func main() {
 	allRecords.Sort()
 
 	w := bufio.NewWriter(outFile)
+	// 最初にBOMを出力する
+	w.Write([]byte{0xEF, 0xBB, 0xBF})
+	// レコード出力
 	for _, r := range allRecords {
 		if _, err := w.WriteString(r.ToString() + "\r\n"); err != nil {
 			fmt.Printf("ファイル出力エラー: %v\n", err)
