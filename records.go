@@ -33,20 +33,20 @@ func (r Records) Sort() {
 	})
 }
 
-func (r *Records) FillDummyRecords() {
+func (r *Records) FillDummyRecords(ymd string) {
 	var addRecords Records
 	var preRecord Record
 	for i, record := range *r {
 		if i == 0 { // 最初のレコードの場合
 			if re := record.region.StartRegion(); re != nil {
-				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
+				addRecord := createDummyRecord(record.gakuKubun, record.jichiCode, ymd)
 				addRecord.region = *re
 				addRecords = append(addRecords, addRecord)
 			}
 		} else { // 2行目以降のレコードの場合
 			if fmr := record.FindMissingRegions(preRecord); fmr != nil {
 				for _, region := range fmr {
-					addRecord := createDummyRecord(record.gakuKubun, region.Start.JichiCode)
+					addRecord := createDummyRecord(record.gakuKubun, region.Start.JichiCode, ymd)
 					re := region
 					addRecord.region = re
 					addRecords = append(addRecords, addRecord)
@@ -56,7 +56,7 @@ func (r *Records) FillDummyRecords() {
 			// 最後のレコードの場合
 			if i == len(*r)-1 {
 				if re := record.region.EndRegion(); re != nil {
-					addRecord := createDummyRecord(record.gakuKubun, record.jichiCode)
+					addRecord := createDummyRecord(record.gakuKubun, record.jichiCode, ymd)
 					addRecord.region = *re
 					addRecords = append(addRecords, addRecord)
 				}

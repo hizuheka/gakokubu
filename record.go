@@ -93,13 +93,13 @@ func createRecord(line string) (Record, error) {
 	return record, nil
 }
 
-func createDummyRecord(kubun, jichiCode string) Record {
+func createDummyRecord(kubun, jichiCode, updateYMD string) Record {
 	return Record{
 		region:       Region{},
 		gakuKubun:    kubun,
 		gakuCode:     "00999",
 		sakujoFlag:   "0",
-		updateYMD:    "99999999",
+		updateYMD:    updateYMD,
 		jichiCode:    jichiCode,
 		updateYMDHMS: "99999999999999",
 	}

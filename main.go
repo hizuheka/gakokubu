@@ -11,11 +11,12 @@ var version string
 
 func main() {
 	var (
-		i, o string
-		v    bool
+		i, o, d string
+		v       bool
 	)
 	flag.StringVar(&i, "i", "", "変換元ファイル")
 	flag.StringVar(&o, "o", "", "変換先ファイル")
+	flag.StringVar(&d, "d", "99999999", "ダミーレコードの更新年月日")
 	flag.BoolVar(&v, "v", false, "version")
 	flag.Parse()
 
@@ -75,10 +76,10 @@ func main() {
 	}
 
 	// 小学校のダミーレコードを補完
-	syogakuRecords.FillDummyRecords()
+	syogakuRecords.FillDummyRecords(d)
 
 	// 中学校のダミーレコードを補完
-	chugakuRecords.FillDummyRecords()
+	chugakuRecords.FillDummyRecords(d)
 
 	// 小学校と中学校を結合してソート
 	allRecords := append(syogakuRecords, chugakuRecords...)
